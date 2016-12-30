@@ -1,0 +1,40 @@
+#!/usr/bin/env python3.5
+
+import sys
+import os
+import logging
+
+from subprocess import Popen, PIPE
+
+
+def run_tests():
+    tests_dir = os.path.join(os.path.abspath(os.curdir), 'tests.py')
+    params = ['python3.5', tests_dir]
+    tests_proc = Popen(params, stdout=PIPE)
+    tests_proc.wait()
+    return tests_proc.returncode
+
+
+if __name__ == '__main__':
+    logging.basicConfig(
+        level=logging.INFO,
+        format=u'%(filename)s# %(levelname)-8s [%(asctime)s] %(message)s',
+        datefmt=u'%m/%d/%Y %I:%M:%S %p'
+    )
+
+    tests_result_code = run_tests()
+    if tests_result_code:
+        logging.error(
+            '''
+            Git commit is impossible because of testing errors.
+            Pre-commit testing is complete with code: %d.
+            ''',
+            tests_result_code
+        )
+    else:
+        logging.info(
+            'Pre-commit testing is complete with code: %d',
+            tests_result_code
+        )
+
+    sys.exit(tests_result_code)
